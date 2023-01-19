@@ -1,14 +1,29 @@
 service: lambda-file-converter
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs14.x
+  ecr:
+    images:
+      node16-libre-lambda:
+        path: ./
 
 functions:
-  hello:
-    handler: handler.hello
+  convertFile:
+    image:
+      name: node16-libre-lambda
     events:
-      - httpApi:
-          path: /
-          method: get
+      - s3:
+          bucket: !Ref ConvertFileUploads
+          event: s3:ObjectCreated:*
+          existing: true
+
+
+
+resources:
+  Resources:
+    ConvertFileUploads:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: convert-file-uploads
