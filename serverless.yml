@@ -8,6 +8,8 @@ provider:
     images:
       node16-libre-lambda:
         path: ./
+  environment:
+    CONVERTED_FILE_UPLOAD_BUCKET: !Ref StoreConvertedFiles
 
 functions:
   convertFile:
@@ -27,3 +29,7 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: convert-file-uploads
+    StoreConvertedFiles:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: store-converted-files
