@@ -16,25 +16,22 @@ module.exports.convertFile = async (event) => {
     };
     const fileFromS3 = await s3.getObject(consumerS3Params).promise();
     const filePath = `/tmp/${fileName}`;
-
     await fs.writeFile(filePath, fileFromS3.Body);
-
     if (!canBeConvertedToPDF(fileName)) {
       const fileNotSupportedError = new Error();
       fileNotSupportedError.name = "File Not Supported";
       fileNotSupportedError.message = "Uploaded File Not Supported";
-      throw new Error("Cannot Convert File");
+      throw fileNotSupportedError;
     }
-
     const convertedFilePath = convertTo(fileName, "pdf");
     const fileData = await fs.readFile(convertedFilePath);
     const base64Data = Buffer.from(fileData, "binary");
+    const [newFileName] = convertedFilePath.split("/").slice(-1);
     const uploadS3Params = {
       Body: base64Data,
       Bucket: CONVERTED_FILE_UPLOAD_BUCKET,
-      Key: "converted_file.pdf",
+      Key: newFileName,
     };
-
     await s3.putObject(uploadS3Params).promise();
   } catch (error) {
     console.log("ERROR : ", error);

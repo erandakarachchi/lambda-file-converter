@@ -21,8 +21,6 @@ functions:
           event: s3:ObjectCreated:*
           existing: true
 
-
-
 resources:
   Resources:
     ConvertFileUploads:
